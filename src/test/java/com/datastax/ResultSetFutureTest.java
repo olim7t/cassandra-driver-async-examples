@@ -30,9 +30,11 @@ public class ResultSetFutureTest extends TestBase {
     public void should_complete_asynchronously() throws ExecutionException, InterruptedException {
         ResultSetFuture future = session.executeAsync("SELECT release_version FROM system.local");
 
+        // For demonstration purpose only (don't do this in your code)
         while (!future.isDone()) {
             logger.debug("Waiting for request to complete");
         }
+
         ResultSet rs = future.get();
         logger.debug("Got response: {}", rs.one().getString("release_version"));
     }
