@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
@@ -56,7 +58,8 @@ public class ResultSets {
      */
     public static Observable<ResultSet> queryAllAsObservable(Session session, String query, Object... partitionKeys) {
         List<ResultSetFuture> futures = sendQueries(session, query, partitionKeys);
-        List<Observable<ResultSet>> observables = Lists.transform(futures, Observable::from);
+        Scheduler scheduler = Schedulers.io();
+        List<Observable<ResultSet>> observables = Lists.transform(futures, (ResultSetFuture future) -> Observable.from(future, scheduler));
         return Observable.merge(observables);
     }
 
